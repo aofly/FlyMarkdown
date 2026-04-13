@@ -1,0 +1,13 @@
+{
+  "name": "fly-markdown-editor",
+  "version": "1.0.0",
+  "description": "一个功能强大的 Markdown 实时预览编辑器",
+  "main": "index.html",
+  "scripts": {
+    "dev": "python3 -m http.server 3000",
+    "start": "python3 -m http.server 3000"
+  },
+  "keywords": ["markdown", "editor", "preview"],
+  "author": "",
+  "license": "MIT"
+}

@@ -1,0 +1,26 @@
+# 备份文件
+*.backup
+*.bak
+
+# 编辑器临时文件
+*.swp
+*.swo
+*~
+
+# 系统文件
+.DS_Store
+Thumbs.db
+
+# 日志文件
+*.log
+npm-debug.log*
+
+# 构建产物
+dist/
+build/
+.cache/
+
+# 临时文件
+tmp/
+temp/
+*.tmp
