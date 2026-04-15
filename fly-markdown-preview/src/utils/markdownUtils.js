@@ -1,11 +1,12 @@
 import * as marked from 'marked';
 import DOMPurify from 'dompurify';
 import hljs from 'highlight.js';
-import katex from 'katex';
 import 'katex/dist/katex.min.css';
-import mermaid from 'mermaid';
-import * as echarts from 'echarts';
 import JSON5 from 'json5';
+
+// 动态导入大型依赖
+let mermaid = null;
+let echarts = null;
 
 // 配置marked
 marked.setOptions({
@@ -27,26 +28,37 @@ export const renderMarkdown = (content) => {
 };
 
 // 渲染Mermaid图表
-export const renderMermaid = (container) => {
+export const renderMermaid = async (container) => {
   if (container) {
-    mermaid.init({ startOnLoad: false }, container.querySelectorAll('.mermaid'));
+    const mermaidElements = container.querySelectorAll('.mermaid');
+    if (mermaidElements.length > 0) {
+      if (!mermaid) {
+        mermaid = (await import('mermaid')).default;
+      }
+      mermaid.init({ startOnLoad: false }, mermaidElements);
+    }
   }
 };
 
 // 渲染ECharts图表
-export const renderECharts = (container) => {
+export const renderECharts = async (container) => {
   if (container) {
     const chartElements = container.querySelectorAll('.echarts');
-    chartElements.forEach(el => {
-      try {
-        const config = JSON5.parse(el.textContent);
-        const chart = echarts.init(el);
-        chart.setOption(config);
-        window.addEventListener('resize', () => chart.resize());
-      } catch (e) {
-        console.error('ECharts config error:', e);
+    if (chartElements.length > 0) {
+      if (!echarts) {
+        echarts = await import('echarts');
       }
-    });
+      chartElements.forEach(el => {
+        try {
+          const config = JSON5.parse(el.textContent);
+          const chart = echarts.init(el);
+          chart.setOption(config);
+          window.addEventListener('resize', () => chart.resize());
+        } catch (e) {
+          console.error('ECharts config error:', e);
+        }
+      });
+    }
   }
 };
 
@@ -114,7 +126,7 @@ export const getFormattedText = (format, selectedText = '') => {
     case 'math-inline':
       return `$${selectedText || 'E=mc^2'}$`;
     case 'math-block':
-      return `$$\n${selectedText || '\int_0^1 x^2 dx'}\n$$`;
+      return `$$\n${selectedText || '\\int_0^1 x^2 dx'}\n$$`;
     case 'mermaid':
       return `\`\`\`mermaid\ngraph TD\n  A[开始] --> B[处理]\n  B --> C{条件}\n  C -->|是| D[结果1]\n  C -->|否| E[结果2]\n  D --> F[结束]\n  E --> F\n\`\`\``;
     case 'link':
